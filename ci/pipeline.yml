@@ -6,11 +6,11 @@ resources:
       branch: main
 
 jobs:
-  - name: run-pytest
+  - name: install-dependancies
     plan:
       - get: concourse-pytest
         trigger: true
-      - task: pytest-test
+      - task: install-dependancies
         config:
           platform: linux
           image_resource:
@@ -18,9 +18,40 @@ jobs:
             source: {repository: python}
           inputs:
             - name: concourse-pytest
+          outputs: 
+            - name: pytest-installed
+          run:
+            path: /bin/sh
+            args:
+            - -c
+            - |
+              pip3 install pytest pytest-xdist
+
+  - name: execute-pytest
+    serial: true
+    plan:
+      - get: concourse-pytest
+        trigger: true
+        passed: [install-dependancies]
+      - task: run-pytest
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: python}
+          inputs:
+            - name: concourse-pytest
+            - name: pytest-installed
           run:
             dir: concourse-pytest
-            path: python
+            #path: python
+            #args:
+            #  - -m pytest
+            path: /bin/sh
             args:
-              - -m
-              - pytest
+            - -c
+            - |
+              #pip3 install pytest pytest-xdist
+              pwd
+              ls -al
+              python -m pytest -v test_compare.py
