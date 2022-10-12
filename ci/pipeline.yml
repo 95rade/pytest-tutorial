@@ -3,7 +3,7 @@ resources:
     type: git
     source:
       uri: https://github.com/95rade/pytest-tutorial
-      branch: master
+      branch: main
 
 jobs:
   - name: run-pytest
