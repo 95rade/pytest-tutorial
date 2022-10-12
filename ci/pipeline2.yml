@@ -1,3 +1,4 @@
+---
 resources:
   - name: concourse-pytest
     type: git
@@ -27,13 +28,13 @@ jobs:
             - |
               pip3 install pytest pytest-xdist
 
-  - name: execute-pytest
+  - name: run-pytest-smoke
     serial: true
     plan:
       - get: concourse-pytest
         trigger: true
         passed: [install-dependancies]
-      - task: run-pytest
+      - task: run-smoke
         config:
           platform: linux
           image_resource:
@@ -55,3 +56,31 @@ jobs:
               pwd
               ls -al
               python -m pytest -v test_compare.py
+
+  - name: run-pytest-acceptance
+    serial: true
+    plan:
+      - get: concourse-pytest
+        trigger: true
+        passed: [run-pytest-smoke]
+      - task: run-acceptance
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            #source: {repository: python}
+            source: {repository: qnib/pytest}
+          inputs:
+            - name: concourse-pytest
+          run:
+            dir: concourse-pytest
+            #path: python
+            #args:
+            #  - -m pytest
+            path: /bin/sh
+            args:
+            - -c
+            - |
+              #pip3 install pytest pytest-xdist
+              # no longer needed since we have pytest docker image.
+              python -m pytest -v test_div_by_3_6.py
