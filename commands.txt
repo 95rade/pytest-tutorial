@@ -1,0 +1,93 @@
+""" CH 6 TEST FILE EXECUTION
+============================
+pytest -v  # executes ALL the tests  
+pytest <filename> -v  # executes one test file.
+pytest test_compare.py -v
+
+""" CH 7 SUBSTRING MATCHING
+===========================
+pytest -k <substring> -v
+pytest -k great -v  will run:
+
+    test_compare.py::test_greater FAILED
+    test_compare.py::test_greater_equal PASSED
+
+""" CH 8 GROUPING THE TESTS
+===========================
+@pytest.mark.<markername>
+pytest -m <markername> -v
+pytest -m others -v  will only run test_compare.py:
+
+@pytest.mark.others
+def test_less():
+    num = 100
+    assert num < 200
+
+""" CH 9 & 10 CONFTEST.PY
+=========================
+pytest -k divisible -v   will run:
+
+test_div_by_13.py::test_divisible_by_13 PASSED
+test_div_by_3_6.py::test_divisible_by_3 PASSED
+test_div_by_3_6.py::test_divisible_by_6 FAILED
+
+""" CH 11 PARAMETERIZING
+========================
+@pytest.mark.parametrize
+test_multiplication.py
+    import pytest
+    @pytest.mark.parametrize("num, output",[(1,11),(2,22),(3,35),(4,44)])
+    def test_multiplication_11(num, output):
+        assert 11 * num == output
+pytest -k multiplication -v
+    test_multiplication.py::test_multiplication_11[1-11] PASSED
+    test_multiplication.py::test_multiplication_11[2-22] PASSED
+    test_multiplication.py::test_multiplication_11[3-35] FAILED
+    test_multiplication.py::test_multiplication_11[4-44] PASSED
+    ============================================== FAILURES
+
+""" CH 12 XFAIL SKIPPING TESTS
+==============================
+@pytest.mark.xfail
+@pytest.mark.SKIPPING
+test_compare.py
+    import pytest
+    @pytest.mark.xfail
+    @pytest.mark.great
+    def test_greater():
+        num = 100
+        assert num > 100
+pytest test_compare.py -v
+    test_compare.py::test_greater xfail
+    test_compare.py::test_greater_equal XPASS
+    test_compare.py::test_less SKIPPED
+============================ 1 skipped, 1 xfailed, 1 xpassed in 0.06 seconds
+
+""" CH 13 STOP AFTER x FAILURES
+===============================
+pytest --maxfail=<num>
+test_failure.py
+    import pytest
+    import math
+    def test_sqrt_failure():
+        num = 25
+        assert math.sqrt(num) == 6
+    def test_square_failure():
+        num = 7
+        assert 7 * 7 == 40
+    def test_equality_failure():
+        assert 10 == 11
+pytest test_failure.py -v --maxfail=1
+    test_failure.py::test_sqrt_failure FAILED
+
+""" CH 14 RUN IN PARALLEL
+=========================
+pip install pytest-xdist
+pytest -n <num>
+pytest -n 3
+
+""" CH 15 RESULTS IN XML
+========================
+pytest test_multiplication.py -v --junitxml="result.xml"
+
+

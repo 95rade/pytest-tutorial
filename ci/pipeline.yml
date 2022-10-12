@@ -1,6 +1,9 @@
+---
 resources:
   - name: concourse-pytest
     type: git
+    icon: github
+    check_every: 30m
     source:
       uri: https://github.com/95rade/pytest-tutorial
       branch: main
@@ -27,7 +30,7 @@ jobs:
             - |
               pip3 install pytest pytest-xdist
 
-  - name: execute-pytest
+  - name: run-pytest-smoke
     serial: true
     plan:
       - get: concourse-pytest

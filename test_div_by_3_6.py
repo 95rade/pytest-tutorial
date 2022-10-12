@@ -1,12 +1,12 @@
 import pytest
 
-'''
+"""
 @pytest.fixture
 def input_value():
     input=39
     return input
 # CONFTEST.PY HAS THE FIXTURE FUNCTION
-'''
+"""
 # pytest -k divisible -v -s  --> WILL CALL @pytest.fixture FUNCTION TO ASSERT TESTS CONTAINING DIVISIBLE WORD
 def test_divisible_by_3(input_value):
     assert input_value % 3 == 0
