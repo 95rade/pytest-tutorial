@@ -1,0 +1,26 @@
+resources:
+  - name: concourse-pytest
+    type: git
+    source:
+      uri: https://github.com/95rade/pytest-tutorial
+      branch: master
+
+jobs:
+  - name: run-pytest
+    plan:
+      - get: concourse-pytest
+        trigger: true
+      - task: pytest-test
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source: {repository: python}
+          inputs:
+            - name: concourse-pytest
+          run:
+            dir: concourse-pytest
+            path: python
+            args:
+              - -m
+              - pytest
