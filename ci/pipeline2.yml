@@ -8,6 +8,19 @@ resources:
       uri: https://github.com/95rade/pytest-tutorial
       branch: main
 
+  - name: slack-alert
+    type: slack-notification
+    icon: slack
+    source:
+      url: ((slack-webhook))
+
+resource_types:
+  - name: slack-notification
+    type: docker-image
+    source:
+      repository: cfcommunity/slack-notification-resource
+      tag: v1.3.0
+
 jobs:
   - name: install-dependancies
     plan:
@@ -58,6 +71,30 @@ jobs:
               pwd
               ls -al
               python -m pytest -v test_compare.py
+        on_failure:
+            put: slack-alert
+            params:
+                channel: '#concourse'
+                #username: 'rade'
+                #icon_emoji: ':concourse:'    # set in slack webhook settings
+                icon_url: http://cl.ly/image/3e1h0H3H2s0P/concourse-logo.png
+                silent: true
+                text: |
+                      *$BUILD_PIPELINE_NAME/$BUILD_JOB_NAME* ($BUILD_NAME) FAILED - Testing image failure
+                      https://ci.domain.xyz/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+
+        on_success:
+            put: slack-alert
+            params:
+                channel: '#concourse'
+                #username: 'rade'
+                #icon_emoji: ':concourse:'    # set in slack webhook settings
+                icon_url: http://cl.ly/image/3e1h0H3H2s0P/concourse-logo.png
+                silent: true
+                text: |
+                      *$BUILD_PIPELINE_NAME/$BUILD_JOB_NAME* ($BUILD_NAME) SUCCESS - Testing image Succeeded
+                      https://ci.domain.xyz/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+
 
   - name: run-pytest-acceptance
     serial: true
@@ -86,14 +123,38 @@ jobs:
               #pip3 install pytest pytest-xdist
               # no longer needed since we have pytest docker image.
               python -m pytest -v test_div_by_3_6.py::test_divisible_by_3
+        on_failure:
+            put: slack-alert
+            params:
+                channel: '#concourse'
+                #username: 'rade'
+                #icon_emoji: ':concourse:'    # set in slack webhook settings
+                icon_url: http://cl.ly/image/3e1h0H3H2s0P/concourse-logo.png
+                silent: true
+                text: |
+                      *$BUILD_PIPELINE_NAME/$BUILD_JOB_NAME* ($BUILD_NAME) FAILED - Testing image failure
+                      https://ci.domain.xyz/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+
+        on_success:
+            put: slack-alert
+            params:
+                channel: '#concourse'
+                #username: 'rade'
+                #icon_emoji: ':concourse:'    # set in slack webhook settings
+                icon_url: http://cl.ly/image/3e1h0H3H2s0P/concourse-logo.png
+                silent: true
+                text: |
+                      *$BUILD_PIPELINE_NAME/$BUILD_JOB_NAME* ($BUILD_NAME) SUCCESS - Testing image Succeeded
+                      https://ci.domain.xyz/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+
   
   - name: run-performance-tests
     serial: true
     plan:
       - get: concourse-pytest
         trigger: true
-        passed: [run-pytest-acceptance,run-pytest-smoke]
-      - task: run-performance
+        passed: [run-pytest-smoke,run-pytest-acceptance]
+      - task: run-performance-task
         config:
           platform: linux
           image_resource:
@@ -109,3 +170,27 @@ jobs:
               #pip3 install pytest pytest-xdist
               # no longer needed since we have pytest docker image.
               python -m pytest --collect-only
+        on_failure:
+            put: slack-alert
+            params:
+                channel: '#concourse'
+                #username: 'rade'
+                #icon_emoji: ':concourse:'    # set in slack webhook settings
+                icon_url: http://cl.ly/image/3e1h0H3H2s0P/concourse-logo.png
+                silent: true
+                text: |
+                      *$BUILD_PIPELINE_NAME/$BUILD_JOB_NAME* ($BUILD_NAME) FAILED - Testing image failure
+                      https://ci.domain.xyz/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+
+        on_success:
+            put: slack-alert
+            params:
+                channel: '#concourse'
+                #username: 'rade'
+                #icon_emoji: ':concourse:'    # set in slack webhook settings
+                icon_url: http://cl.ly/image/3e1h0H3H2s0P/concourse-logo.png
+                silent: true
+                text: |
+                      *$BUILD_PIPELINE_NAME/$BUILD_JOB_NAME* ($BUILD_NAME) SUCCESS - Testing image Succeeded
+                      https://ci.domain.xyz/teams/$BUILD_TEAM_NAME/pipelines/$BUILD_PIPELINE_NAME/jobs/$BUILD_JOB_NAME/builds/$BUILD_NAME
+
