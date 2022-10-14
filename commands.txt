@@ -80,14 +80,21 @@ test_failure.py
 pytest test_failure.py -v --maxfail=1
     test_failure.py::test_sqrt_failure FAILED
 
-""" CH 14 RUN IN PARALLEL
+## CH 14 RUN IN PARALLEL
 =========================
 pip install pytest-xdist
 pytest -n <num>
 pytest -n 3
 
-""" CH 15 RESULTS IN XML
+## CH 15 RESULTS IN XML
 ========================
 pytest test_multiplication.py -v --junitxml="result.xml"
+
+## STOP ON FIRST FAILURES
+pytest -x
+
+## TURN CAPTURE OFF (PRINT = YES)
+pytest -s  or --capture=no
+
 
 

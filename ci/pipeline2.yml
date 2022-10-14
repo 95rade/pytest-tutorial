@@ -64,7 +64,7 @@ jobs:
     plan:
       - get: concourse-pytest
         trigger: true
-        passed: [run-pytest-smoke]
+        passed: [install-dependancies]
       - task: run-acceptance
         config:
           platform: linux
@@ -85,4 +85,27 @@ jobs:
             - |
               #pip3 install pytest pytest-xdist
               # no longer needed since we have pytest docker image.
-              python -m pytest -v test_div_by_3_6.py
+              python -m pytest -v test_div_by_3_6.py::test_divisible_by_3
+  
+  - name: run-performance-tests
+    serial: true
+    plan:
+      - get: concourse-pytest
+        trigger: true
+        passed: [run-pytest-acceptance,run-pytest-smoke]
+      - task: run-performance
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            #source: {repository: python}
+            source: {repository: qnib/pytest}
+          run:
+            dir: concourse-pytest
+            path: /bin/sh
+            args:
+            - -c
+            - |
+              #pip3 install pytest pytest-xdist
+              # no longer needed since we have pytest docker image.
+              python -m pytest --collect-only
