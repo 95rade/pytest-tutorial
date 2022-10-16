@@ -96,5 +96,25 @@ pytest -x
 ## TURN CAPTURE OFF (PRINT = YES)
 pytest -s  or --capture=no
 
+## ONLY COLLECT TESTS BUT NOT RUN THEM
+pytest --collect-only
+
+## TURN OFF TRACEBACK (IF YOU ALREADY SAW IT)
+pytest --tb=no
+
+## RE-RUN FAILED TEST ( GOES WELL WITH --tb=no )
+pytest --lf (--last-failed)
+
+## RE-RUN THE TEST THAT PASSED LAST TIME
+pytest --ff (--first-failed)
+
+## RUN QUITE ( OPPOSITE FROM -V )
+pytest -q
+
+
+
+
+
+
 
 
